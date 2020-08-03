@@ -1,0 +1,7 @@
+gunicorn
+flask
+dash
+plotly
+sqlite3
+pandas
+python-dateutil
