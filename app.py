@@ -23,7 +23,7 @@ app = dash.Dash(
     meta_tags=[{"name": "viewport", "content": "width=device-width, initial-scale=1"}],
 )
 
-GRAPH_INTERVAL = 1000 * 60 * 60
+GRAPH_INTERVAL = 5000 # clientside update
 app_color = {"graph_bg": "#082255", "graph_line": "#007ACE"}
 
 app.layout = html.Div(
