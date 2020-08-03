@@ -126,6 +126,12 @@ app.layout = html.Div(
     className="app__container",
 )
 
+def slen(df):
+    if len(df) > 0:
+        return df
+    else:
+        return [0]
+
 @app.callback(
     Output("temperature", "figure"), [Input("temperature-update", "n_intervals")]
 )
@@ -173,8 +179,8 @@ def gen_temp(interval):
             "title": "Datetime",
         },
         yaxis={
-            "range": [min(min(df['INSIDE'],), min(df['OUTSIDE'],)) - 5,
-                      max(max(df['INSIDE'],), max(df['OUTSIDE'])) + 5],
+            "range": [min(min(slen(df['INSIDE'])), min(slen(df['OUTSIDE']))) - 5,
+                      max(max(slen(df['INSIDE'])), max(slen(df['OUTSIDE']))) + 5],
             "showgrid": True,
             "showline": True,
             "fixedrange": True,
@@ -236,8 +242,8 @@ def humidity(interval):
             "title": "Datetime",
         },
         yaxis={
-            "range": [min(min(df['INSIDE'],), min(df['OUTSIDE'],)) - 5,
-                      max(max(df['INSIDE'],), max(df['OUTSIDE'])) + 5],
+            "range": [min(min(slen(df['INSIDE'])), min(slen(df['OUTSIDE']))) - 5,
+                      max(max(slen(df['INSIDE'])), max(slen(df['OUTSIDE']))) + 5],
             "showgrid": True,
             "showline": True,
             "fixedrange": True,
@@ -287,8 +293,8 @@ def gen_dif(interval):
             "title": "Datetime",
         },
         yaxis={
-            "range": [min(df["DIF"]) - 5,
-                      max(df["DIF"]) + 5],
+            "range": [min(slen(df["DIF"])) - 5,
+                      max(slen(df["DIF"])) + 5],
             "showgrid": True,
             "showline": True,
             "fixedrange": True,
