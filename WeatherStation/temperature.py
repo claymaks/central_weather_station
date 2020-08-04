@@ -12,12 +12,14 @@ while True:
         temperature_c_i = inside_sensor.temperature
         temperature_f_i = temperature_c_i * (9 / 5) + 32
         humidity_i = inside_sensor.humidity
+        print("INSIDE:")
         print("\tTemp: {:.1f} F / {:.1f} C    Humidity: {}% ".format(
             temperature_f_i, temperature_c_i, humidity_i))
 
-        temperature_c_o = inside_sensor.temperature
+        temperature_c_o = ouside_sensor.temperature
         temperature_f_o = temperature_c_o * (9 / 5) + 32
-        humidity_o = inside_sensor.humidity
+        humidity_o = ouside_sensor.humidity
+        print("OUTSIDE:")
         print("\tTemp: {:.1f} F / {:.1f} C    Humidity: {}% ".format(
             temperature_f_o, temperature_c_o, humidity_o))
 
