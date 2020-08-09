@@ -19,6 +19,13 @@ class BadRead(Exception):
     pass
 
 while True:
+    temp_i_buffer = []
+    temp_o_buffer = []
+
+    humi_i_buffer = []
+    humi_o_buffer = []
+
+    dt_buffer = []
     for i in range(buffer // measure_delay):
         read_success = False
         
