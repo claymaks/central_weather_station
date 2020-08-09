@@ -15,6 +15,9 @@ humi_o_buffer = []
 
 dt_buffer = []
 
+class BadRead(Exception):
+    pass
+
 while True:
     for i in range(buffer // measure_delay):
         read_success = False
@@ -27,7 +30,7 @@ while True:
                 # Print the values to the serial port
                 temperature_c_i = inside_sensor.temperature
                 if temperature_c_i is None:
-                    raise ValueError
+                    raise BadRead
                 temperature_f_i = temperature_c_i * (9 / 5) + 32
                 humidity_i = inside_sensor.humidity
                 print("\tINSIDE:")
@@ -49,7 +52,7 @@ while True:
                 # Errors happen fairly often, DHT's are hard to read, just keep going
                 print("\n", error.args[0].upper(), "\n")
                 read_success = False
-            except ValueError:
+            except BadRead:
                 print("\nBAD READ\n")
                 read_success = False
 
