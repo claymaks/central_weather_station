@@ -315,7 +315,7 @@ def add_data(table):
                                  request.json['inside'],
                                  request.json['outside']):
         print(f"\t{dt}: {inside} {outside}")
-        insert_data(table.upper(), dt, float(inside), float(outside0))
+        insert_data(table.upper(), dt, float(inside), float(outside))
     return ''
 
 
