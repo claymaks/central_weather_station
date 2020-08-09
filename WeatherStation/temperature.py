@@ -26,7 +26,7 @@ while True:
                 # Print the values to the serial port
                 temperature_c_i = inside_sensor.temperature
                 if temperature_c_i is None:
-                    raise RuntimeError
+                    raise ValueError
                 temperature_f_i = temperature_c_i * (9 / 5) + 32
                 humidity_i = inside_sensor.humidity
                 print("\tINSIDE:")
@@ -35,7 +35,7 @@ while True:
 
                 temperature_c_o = ouside_sensor.temperature
                 if temperature_c_o is None:
-                    raise RuntimeError
+                    raise ValueError
                 temperature_f_o = temperature_c_o * (9 / 5) + 32
                 humidity_o = ouside_sensor.humidity
                 print("\tOUTSIDE:")
@@ -47,6 +47,9 @@ while True:
             except RuntimeError as error:
                 # Errors happen fairly often, DHT's are hard to read, just keep going
                 print("\n", error.args[0].upper(), "\n")
+                read_success = False
+            except ValueError:
+                print("\nBAD READ\n")
                 read_success = False
 
         temp_i_buffer.append(temperature_f_i)
