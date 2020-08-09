@@ -60,6 +60,7 @@ app.layout = html.Div(
                                     paper_bgcolor=app_color["graph_bg"],
                                 )
                             ),
+                            animate=True,
                         ),
                         dcc.Interval(
                             id="temperature-update",
@@ -91,6 +92,7 @@ app.layout = html.Div(
                                             paper_bgcolor=app_color["graph_bg"],
                                         )
                                     ),
+                                    animate=True,
                                 ),
                             ],
                             className="graph__container first",
@@ -113,6 +115,7 @@ app.layout = html.Div(
                                             paper_bgcolor=app_color["graph_bg"],
                                         )
                                     ),
+                                    animate=True,
                                 ),
                             ],
                             className="graph__container second",
@@ -176,7 +179,7 @@ def gen_temp(interval):
                         datetime.datetime.now() + datetime.timedelta(0, 60*60*4)],
             "showline": True,
             "zeroline": False,
-            "fixedrange": True,
+            "fixedrange": False,
             "title": "Datetime",
         },
         yaxis={
@@ -184,7 +187,7 @@ def gen_temp(interval):
                       max(max(slen(df['INSIDE'])), max(slen(df['OUTSIDE']))) + 5],
             "showgrid": True,
             "showline": True,
-            "fixedrange": True,
+            "fixedrange": False,
             "zeroline": False,
             "gridcolor": app_color["graph_line"],
             "nticks": 6
@@ -239,7 +242,7 @@ def humidity(interval):
                         datetime.datetime.now() + datetime.timedelta(0, 60*60)],
             "showline": True,
             "zeroline": False,
-            "fixedrange": True,
+            "fixedrange": False,
             "title": "Datetime",
         },
         yaxis={
@@ -247,7 +250,7 @@ def humidity(interval):
                       max(max(slen(df['INSIDE'])), max(slen(df['OUTSIDE']))) + 5],
             "showgrid": True,
             "showline": True,
-            "fixedrange": True,
+            "fixedrange": False,
             "zeroline": False,
             "gridcolor": app_color["graph_line"],
             "nticks": 6
@@ -290,7 +293,7 @@ def gen_dif(interval):
                         datetime.datetime.now() + datetime.timedelta(0, 60*60)],
             "showline": True,
             "zeroline": False,
-            "fixedrange": True,
+            "fixedrange": False,
             "title": "Datetime",
         },
         yaxis={
@@ -298,7 +301,7 @@ def gen_dif(interval):
                       max(slen(df["DIF"])) + 5],
             "showgrid": True,
             "showline": True,
-            "fixedrange": True,
+            "fixedrange": False,
             "zeroline": False,
             "gridcolor": app_color["graph_line"],
             "nticks": 6
