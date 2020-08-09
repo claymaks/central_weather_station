@@ -19,7 +19,7 @@ import datetime
 
 server = flask.Flask(__name__)
 server.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-server.config["SQLALCHEMY_DATABASE_URI"] = 'postgresql://localhost/weather'
+server.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get('DATABASE_URL', 'postgresql://localhost/weather')
 heroku = Heroku(server)
 db = SQLAlchemy(server)
 
