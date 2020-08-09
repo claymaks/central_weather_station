@@ -29,8 +29,8 @@ while True:
             try:
                 # Print the values to the serial port
                 temperature_c_i = inside_sensor.temperature
-                if temperature_c_i is None:
-                    raise BadRead
+                #if temperature_c_i is None:
+                #    raise BadRead
                 temperature_f_i = temperature_c_i * (9 / 5) + 32
                 humidity_i = inside_sensor.humidity
                 print("\tINSIDE:")
@@ -38,8 +38,8 @@ while True:
                     temperature_f_i, temperature_c_i, humidity_i))
 
                 temperature_c_o = ouside_sensor.temperature
-                if temperature_c_o is None:
-                    raise ValueError
+                #if temperature_c_o is None:
+                #    raise ValueError
                 temperature_f_o = temperature_c_o * (9 / 5) + 32
                 humidity_o = ouside_sensor.humidity
                 print("\tOUTSIDE:")
