@@ -18,10 +18,11 @@ dt_buffer = []
 while True:
     for i in range(buffer // measure_delay):
         read_success = False
-        print("(", i, ", ", sep='', end='')
+        
         attempt = 0
         while not read_success:
-            print(attempt, ")", sep='')
+            print("(", i, ", ", attempt, ")", sep='')
+            attempt += 1
             try:
                 # Print the values to the serial port
                 temperature_c_i = inside_sensor.temperature
