@@ -16,30 +16,33 @@ humi_o_buffer = []
 dt_buffer = []
 
 while True:
-    for _ in range(buffer // measure_delay):
+    for i in range(buffer // measure_delay):
         read_success = False
+        print("(", i, ", ", sep='', end='')
+        attempt = 0
         while not read_success:
+            print(attempt, ")", sep='')
             try:
                 # Print the values to the serial port
                 temperature_c_i = inside_sensor.temperature
                 temperature_f_i = temperature_c_i * (9 / 5) + 32
                 humidity_i = inside_sensor.humidity
-                print("INSIDE:")
-                print("\tTemp: {:.1f} F / {:.1f} C    Humidity: {}% ".format(
+                print("\tINSIDE:")
+                print("\t\tTemp: {:.1f} F / {:.1f} C    Humidity: {}% ".format(
                     temperature_f_i, temperature_c_i, humidity_i))
 
                 temperature_c_o = ouside_sensor.temperature
                 temperature_f_o = temperature_c_o * (9 / 5) + 32
                 humidity_o = ouside_sensor.humidity
-                print("OUTSIDE:")
-                print("\tTemp: {:.1f} F / {:.1f} C    Humidity: {}% ".format(
+                print("\tOUTSIDE:")
+                print("\t\tTemp: {:.1f} F / {:.1f} C    Humidity: {}% ".format(
                     temperature_f_o, temperature_c_o, humidity_o))
 
                 read_success = True
 
             except RuntimeError as error:
                 # Errors happen fairly often, DHT's are hard to read, just keep going
-                print(error.args[0])
+                print("\n", error.args[0].upper(), "\n")
                 read_success = False
 
         temp_i_buffer.append(temperature_f_i)
@@ -49,6 +52,7 @@ while True:
         dt_buffer.append(int(time.time()))
         
         time.sleep(measure_delay)
+        
     requests.post("http://cmaks-weather.herokuapp.com/add-data/temperature",
                   json={'dt': dt_buffer,
                         'inside': temp_i_buffer,
