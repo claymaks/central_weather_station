@@ -336,6 +336,12 @@ def gen_dif(interval, value):
     return dict(data=[dif_graph], layout=layout)
 
 
+@server.route("/get-data/<string:table>", methods=["GET"])
+def get_data(table):
+    df = get_temp_data(table.upper(), 0, int(time.time()))
+    print(f"[{table}]")
+    return df.to_json()
+
 @server.route("/add-data/<string:table>", methods=["GET", "POST", "PUT"])
 def add_data(table):
     print(f"[{table}]")
