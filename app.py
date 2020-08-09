@@ -310,9 +310,12 @@ def gen_dif(interval):
 
 @server.route("/add-data/<string:table>", methods=["GET", "POST", "PUT"])
 def add_data(table):
-    insert_data(table.upper(), request.json['dt'],
-                float(request.json['inside']),
-                float(request.json['inside']))
+    print(f"[{table}]")
+    for dt, inside, outside in zip(request.json['dt'],
+                                 request.json['inside'],
+                                 request.json['outside']):
+        print(f"\t{dt}: {inside} {outside}")
+        insert_data(table.upper(), dt, float(inside), float(outside0))
     return ''
 
 
