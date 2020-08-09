@@ -1,5 +1,7 @@
 import flask
 from flask import request
+from flask_sqlalchemy import SQLAlchemy
+from flask_heroku import Heroku
 
 import dash
 from dash.dependencies import Output, Input
@@ -8,14 +10,57 @@ import dash_html_components as html
 import plotly
 import plotly.graph_objs as go
 
-from db.api import get_temp_data, insert_data
+#from db.api import get_temp_data, insert_data
 
+import os
 import csv
 import time
 import datetime
 
 server = flask.Flask(__name__)
+server.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+server.config["SQLALCHEMY_DATABASE_URI"] = 'postgresql://localhost/weather'
+heroku = Heroku(server)
+db = SQLAlchemy(server)
 
+class Temperature(db.Model):
+    __tablename__ = "temperature"
+    id = db.Column(db.Integer, primary_key=True)
+    dt = db.Column(db.Integer)
+    inside = db.Column(db.Float)
+    outside = db.Column(db.Float)
+    dif = db.Column(db.Float)
+    
+    
+    def __init__(self, dt, inside, outside, dif):
+        self.dt = dt
+        self.inside = inside
+        self.outside = outside
+        self.dif = dif
+
+    def __repr__(self):
+        return f"TEMPERATURE {self.dt}: {self.outside} - {self.inside} = {self.dif}"
+
+
+class Humidity(db.Model):
+    __tablename__ = "humidity"
+    id = db.Column(db.Integer, primary_key=True)
+    dt = db.Column(db.Integer)
+    inside = db.Column(db.Float)
+    outside = db.Column(db.Float)
+    dif = db.Column(db.Float)
+    
+    
+    def __init__(self, dt, inside, outside, dif):
+        self.dt = dt
+        self.inside = inside
+        self.outside = outside
+        self.dif = dif
+
+    def __repr__(self):
+        return f"HUMIDITY {self.dt}: {self.outside} - {self.inside} = {self.dif}"
+    
+        
 app = dash.Dash(
     __name__,
     server=server,
@@ -145,10 +190,9 @@ app.layout = html.Div(
 )
 
 def slen(df):
-    if len(df) > 0:
-        return df
-    else:
+    if not df or len(df) == 0:
         return [0]
+    return df
 
 
 @app.callback(
@@ -169,15 +213,17 @@ def gen_temp(interval, value):
     Generate the temperature graph.
     :params interval: update the graph based on an interval
     """
-    df = get_temp_data("TEMPERATURE", value[0], value[1])
+    df = db.session.query(Temperature).filter((Temperature.dt >= value[0]) & (Temperature.dt <= value[1])).all()
+    inside = list(map(lambda x: x.inside, df))
+    outside = list(map(lambda x: x.outside, df))
     
     X = list(map(
-        lambda x: datetime.datetime.fromtimestamp(time.mktime(time.gmtime(x))),
-        df['ID']))
+        lambda x: datetime.datetime.fromtimestamp(time.mktime(time.gmtime(x.dt))),
+        df))
     inside_graph = dict(
         type="scatter",
         x=X,
-        y=df['INSIDE'],
+        y=list(map(lambda x: x.inside, df)),
         line={"color": "#42C4F7", "name":"Inside Temperature"},
         hoverinfo="x+y",
         mode="lines",
@@ -187,7 +233,7 @@ def gen_temp(interval, value):
     outside_graph = dict(
         type="scatter",
         x=X,
-        y=df['OUTSIDE'],
+        y=list(map(lambda x: x.outside, df)),
         line={"color": "#FF5733", "name":"Outside Temperature"},
         hoverinfo="x+y",
         mode="lines",
@@ -207,8 +253,8 @@ def gen_temp(interval, value):
             "title": "Datetime",
         },
         yaxis={
-            "range": [min(min(slen(df['INSIDE'])), min(slen(df['OUTSIDE']))) - 5,
-                      max(max(slen(df['INSIDE'])), max(slen(df['OUTSIDE']))) + 5],
+            "range": [min(min(slen(inside)), min(slen(outside))) - 5,
+                      max(max(slen(inside)), max(slen(outside))) + 5],
             "showgrid": True,
             "showline": True,
             "fixedrange": True,
@@ -231,17 +277,18 @@ def humidity(interval, value):
     Generate the humidity graph.
     :params interval: update the graph based on an interval
     """
-    df = get_temp_data("HUMIDITY", value[0], value[1])
+    df = db.session.query(Humidity).filter((Humidity.dt >= value[0]) & (Humidity.dt <= value[1])).all()
     X = list(map(
-        lambda x: datetime.datetime.fromtimestamp(time.mktime(time.gmtime(x))),
-        df['ID']))
-    
+        lambda x: datetime.datetime.fromtimestamp(time.mktime(time.gmtime(x.id))),
+        df))
+    inside = list(map(lambda x: x.inside, df))
+    outside = list(map(lambda x: x.outside, df))
 
 
     humidity_out_graph = dict(
         type="scatter",
         x=X,
-        y=df["OUTSIDE"],
+        y=list(map(lambda x: x.outside, df)),
         line={"color": "#F7C842", "width":1},
         hoverinfo="x+y",
         mode="lines",
@@ -251,7 +298,7 @@ def humidity(interval, value):
     humidity_in_graph = dict(
         type="scatter",
         x=X,
-        y=df["INSIDE"],
+        y=list(map(lambda x: x.inside, df)),
         line={"color": "#42F797", "width":.5},
         hoverinfo="x+y",
         mode="lines",
@@ -271,8 +318,8 @@ def humidity(interval, value):
             "title": "Datetime",
         },
         yaxis={
-            "range": [min(min(slen(df['INSIDE'])), min(slen(df['OUTSIDE']))) - 5,
-                      max(max(slen(df['INSIDE'])), max(slen(df['OUTSIDE']))) + 5],
+            "range": [min(min(slen(inside)), min(slen(outside))) - 5,
+                      max(max(slen(inside)), max(slen(outside))) + 5],
             "showgrid": True,
             "showline": True,
             "fixedrange": True,
@@ -295,15 +342,15 @@ def gen_dif(interval, value):
     Genererate wind histogram graph.
     :params interval: upadte the graph based on an interval
     """
-    df = get_temp_data("TEMPERATURE", value[0], value[1])
+    df = db.session.query(Temperature).filter((Temperature.dt >= value[0]) & (Temperature.dt <= value[1])).all()
     X = list(map(
-        lambda x: datetime.datetime.fromtimestamp(time.mktime(time.gmtime(x))),
-        df['ID']))
-
+        lambda x: datetime.datetime.fromtimestamp(time.mktime(time.gmtime(x.dt))),
+        df))
+    
     dif_graph = dict(
         type="scatter",
         x=X,
-        y=df["DIF"],
+        y=list(map(lambda x: x.dif, df)),
         line={"color": "#F7E942", "width":1},
         hoverinfo="x+y",
         mode="lines",
@@ -322,8 +369,8 @@ def gen_dif(interval, value):
             "title": "Datetime",
         },
         yaxis={
-            "range": [min(slen(df["DIF"])) - 5,
-                      max(slen(df["DIF"])) + 5],
+            "range": [min(slen(list(map(lambda x: x.dif, df)))) - 5,
+                      max(slen(list(map(lambda x: x.dif, df)))) + 5],
             "showgrid": True,
             "showline": True,
             "fixedrange": True,
@@ -338,18 +385,28 @@ def gen_dif(interval, value):
 
 @server.route("/get-data/<string:table>", methods=["GET"])
 def get_data(table):
-    df = get_temp_data(table.upper(), 0, int(time.time()))
+    df = db.session.query(Temperature).filter((Temperature.dt >= 0) & (Temperature.dt <= int(time.time()))).all()
     print(f"[{table}]")
-    return df.to_json()
+    return {'data': list(map(lambda x: (x.id, x.dt, x.inside, x.outside, x.dif), df))}
 
-@server.route("/add-data/<string:table>", methods=["GET", "POST", "PUT"])
+@server.route("/add-data/<string:table>", methods=["POST"])
 def add_data(table):
     print(f"[{table}]")
     for dt, inside, outside in zip(request.json['dt'],
                                  request.json['inside'],
                                  request.json['outside']):
         print(f"\t{dt}: {inside} {outside}")
-        insert_data(table.upper(), dt, float(inside), float(outside))
+        
+        if table == "temperature":
+            data = Temperature(dt, inside, outside, outside-inside)
+            db.session.add(data)
+            db.session.commit()
+        elif table == "humidity":
+            data = Humidity(dt, inside, outside, outside-inside)
+            db.session.add(data)
+            db.session.commit()
+
+        
     return ''
 
 

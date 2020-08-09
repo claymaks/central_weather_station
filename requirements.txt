@@ -4,3 +4,6 @@ dash
 plotly
 pandas
 python-dateutil
+flask-heroku
+flask-sqlalchemy
+psycopg2-binary
