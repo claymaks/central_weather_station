@@ -52,6 +52,23 @@ app.layout = html.Div(
                         html.Div(
                             [html.H6("TEMPERATURE (ºF)", className="graph__title")]
                         ),
+                        dcc.RangeSlider(
+                            id='my-range-slider',
+                            min=time.mktime(datetime.datetime(2020,8,8).timetuple()),
+                            max=time.mktime(datetime.datetime.now().timetuple()),
+                            value=[time.mktime((datetime.datetime.now() - datetime.timedelta(1)).timetuple()),
+                                   time.mktime(datetime.datetime.now().timetuple())],
+                        ),
+
+                        html.Div([
+                            html.P(
+                                "dt - dt",
+                                id="range-info",
+                                className="auto__p",
+                                )
+                        ],
+                        className="auto__container"),
+                        
                         dcc.Graph(
                             id="temperature",
                             figure=dict(
@@ -60,7 +77,6 @@ app.layout = html.Div(
                                     paper_bgcolor=app_color["graph_bg"],
                                 )
                             ),
-                            animate=True,
                         ),
                         dcc.Interval(
                             id="temperature-update",
@@ -92,7 +108,6 @@ app.layout = html.Div(
                                             paper_bgcolor=app_color["graph_bg"],
                                         )
                                     ),
-                                    animate=True,
                                 ),
                             ],
                             className="graph__container first",
@@ -115,7 +130,6 @@ app.layout = html.Div(
                                             paper_bgcolor=app_color["graph_bg"],
                                         )
                                     ),
-                                    animate=True,
                                 ),
                             ],
                             className="graph__container second",
@@ -136,10 +150,21 @@ def slen(df):
     else:
         return [0]
 
+
 @app.callback(
-    Output("temperature", "figure"), [Input("temperature-update", "n_intervals")]
+    Output("range-info", "children"),
+    [Input("my-range-slider", "value")]
 )
-def gen_temp(interval):
+def update_range(value):
+    return datetime.datetime.strftime(datetime.datetime.fromtimestamp(value[0]), "%a %b %d %H:%M:%S %Y") + ' - ' + datetime.datetime.strftime(datetime.datetime.fromtimestamp(value[1]), "%a %b %d %H:%M:%S %Y")
+
+
+@app.callback(
+    Output("temperature", "figure"),
+    [Input("temperature-update", "n_intervals"),
+     Input("my-range-slider", "value")]
+)
+def gen_temp(interval, value):
     """
     Generate the temperature graph.
     :params interval: update the graph based on an interval
@@ -175,19 +200,17 @@ def gen_temp(interval):
         font={"color": "#fff"},
         height=700,
         xaxis={
-            "range": [datetime.datetime.now() - datetime.timedelta(1),
-                        datetime.datetime.now() + datetime.timedelta(0, 60*60*4)],
+            "range": list(map(lambda x: datetime.datetime.fromtimestamp(x), value)),
             "showline": True,
             "zeroline": False,
-            "fixedrange": False,
+            "fixedrange": True,
             "title": "Datetime",
         },
         yaxis={
-            "range": [min(min(slen(df['INSIDE'])), min(slen(df['OUTSIDE']))) - 5,
-                      max(max(slen(df['INSIDE'])), max(slen(df['OUTSIDE']))) + 5],
+            "range": list(map(lambda x: datetime.datetime.fromtimestamp(x), value)),
             "showgrid": True,
             "showline": True,
-            "fixedrange": False,
+            "fixedrange": True,
             "zeroline": False,
             "gridcolor": app_color["graph_line"],
             "nticks": 6
@@ -242,7 +265,7 @@ def humidity(interval):
                         datetime.datetime.now() + datetime.timedelta(0, 60*60)],
             "showline": True,
             "zeroline": False,
-            "fixedrange": False,
+            "fixedrange": True,
             "title": "Datetime",
         },
         yaxis={
@@ -250,7 +273,7 @@ def humidity(interval):
                       max(max(slen(df['INSIDE'])), max(slen(df['OUTSIDE']))) + 5],
             "showgrid": True,
             "showline": True,
-            "fixedrange": False,
+            "fixedrange": True,
             "zeroline": False,
             "gridcolor": app_color["graph_line"],
             "nticks": 6
@@ -293,7 +316,7 @@ def gen_dif(interval):
                         datetime.datetime.now() + datetime.timedelta(0, 60*60)],
             "showline": True,
             "zeroline": False,
-            "fixedrange": False,
+            "fixedrange": True,
             "title": "Datetime",
         },
         yaxis={
@@ -301,7 +324,7 @@ def gen_dif(interval):
                       max(slen(df["DIF"])) + 5],
             "showgrid": True,
             "showline": True,
-            "fixedrange": False,
+            "fixedrange": True,
             "zeroline": False,
             "gridcolor": app_color["graph_line"],
             "nticks": 6
