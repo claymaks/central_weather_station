@@ -169,8 +169,8 @@ def gen_temp(interval, value):
     Generate the temperature graph.
     :params interval: update the graph based on an interval
     """
-
     df = get_temp_data("TEMPERATURE", time.time()- 60*60*24 - 60*30, time.time() + 60*30)
+    
     X = list(map(
         lambda x: datetime.datetime.fromtimestamp(time.mktime(time.gmtime(x))),
         df['ID']))
