@@ -207,7 +207,8 @@ def gen_temp(interval, value):
             "title": "Datetime",
         },
         yaxis={
-            "range": list(map(lambda x: datetime.datetime.fromtimestamp(x), value)),
+            "range": [min(min(slen(df['INSIDE'])), min(slen(df['OUTSIDE']))) - 5,
+                      max(max(slen(df['INSIDE'])), max(slen(df['OUTSIDE']))) + 5],
             "showgrid": True,
             "showline": True,
             "fixedrange": True,
@@ -221,9 +222,11 @@ def gen_temp(interval, value):
 
 
 @app.callback(
-    Output("humidity", "figure"), [Input("temperature-update", "n_intervals")]
+    Output("humidity", "figure"),
+    [Input("temperature-update", "n_intervals"),
+     Input("my-range-slider", "value")]
 )
-def humidity(interval):
+def humidity(interval, value):
     """
     Generate the humidity graph.
     :params interval: update the graph based on an interval
@@ -261,8 +264,7 @@ def humidity(interval):
         font={"color": "#fff"},
         height=350,
         xaxis={
-            "range": [datetime.datetime.now() - datetime.timedelta(0, 60*60*2),
-                        datetime.datetime.now() + datetime.timedelta(0, 60*60)],
+            "range": list(map(lambda x: datetime.datetime.fromtimestamp(x), value)),
             "showline": True,
             "zeroline": False,
             "fixedrange": True,
@@ -285,9 +287,10 @@ def humidity(interval):
 
 @app.callback(
     Output("dif-line", "figure"),
-    [Input("temperature-update", "n_intervals")]
+    [Input("temperature-update", "n_intervals"),
+     Input("my-range-slider", "value")]
 )
-def gen_dif(interval):
+def gen_dif(interval, value):
     """
     Genererate wind histogram graph.
     :params interval: upadte the graph based on an interval
@@ -312,8 +315,7 @@ def gen_dif(interval):
         font={"color": "#fff"},
         height=350,
         xaxis={
-            "range": [datetime.datetime.now() - datetime.timedelta(0, 60*60*2),
-                        datetime.datetime.now() + datetime.timedelta(0, 60*60)],
+            "range": list(map(lambda x: datetime.datetime.fromtimestamp(x), value)),
             "showline": True,
             "zeroline": False,
             "fixedrange": True,

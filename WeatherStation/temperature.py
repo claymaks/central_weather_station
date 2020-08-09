@@ -5,8 +5,8 @@ import requests
 
 inside_sensor = adafruit_dht.DHT11(board.D23)
 ouside_sensor = adafruit_dht.DHT11(board.D24)
-measure_delay = 3 # * 60
-buffer = 60 # * 60
+measure_delay = 10 # * 60
+buffer = 60 * 60
 temp_i_buffer = []
 temp_o_buffer = []
 
@@ -61,12 +61,14 @@ while True:
         
         time.sleep(measure_delay)
         
-    requests.post("http://cmaks-weather.herokuapp.com/add-data/temperature",
+    r1 = requests.post("http://cmaks-weather.herokuapp.com/add-data/temperature",
                   json={'dt': dt_buffer,
                         'inside': temp_i_buffer,
-                        'outside': temp_o_buffer})
-    requests.post("http://cmaks-weather.herokuapp.com/add-data/humidity",
+                        'outside': temp_o_buffer}, timeout=20)
+    print(r1.status_code)
+    r2 = requests.post("http://cmaks-weather.herokuapp.com/add-data/humidity",
                   json={'dt': dt_buffer,
                         'inside': humi_i_buffer,
-                        'outside': humi_o_buffer})
+                        'outside': humi_o_buffer}, timeout=20)
+    print(r2.status_code)
     time.sleep(buffer)
