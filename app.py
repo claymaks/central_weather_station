@@ -23,7 +23,7 @@ server.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get('DATABASE_URL', 'postg
 heroku = Heroku(server)
 db = SQLAlchemy(server)
 
-class Temperature(db.Model):
+class temperature(db.Model):
     __tablename__ = "temperature"
     id = db.Column(db.Integer, primary_key=True)
     dt = db.Column(db.Integer)
@@ -39,10 +39,10 @@ class Temperature(db.Model):
         self.dif = dif
 
     def __repr__(self):
-        return f"TEMPERATURE {self.dt}: {self.outside} - {self.inside} = {self.dif}"
+        return f"temperature {self.dt}: {self.outside} - {self.inside} = {self.dif}"
 
 
-class Humidity(db.Model):
+class humidity(db.Model):
     __tablename__ = "humidity"
     id = db.Column(db.Integer, primary_key=True)
     dt = db.Column(db.Integer)
@@ -58,7 +58,7 @@ class Humidity(db.Model):
         self.dif = dif
 
     def __repr__(self):
-        return f"HUMIDITY {self.dt}: {self.outside} - {self.inside} = {self.dif}"
+        return f"humidity {self.dt}: {self.outside} - {self.inside} = {self.dif}"
     
         
 app = dash.Dash(
@@ -78,9 +78,9 @@ app.layout = html.Div(
             [
                 html.Div(
                     [
-                        html.H4("INSIDE/OUTSIDE TEMPERATURE DIFFERENTIAL", className="app__header__title"),
+                        html.H4("INSIDE/OUTSIDE temperature DIFFERENTIAL", className="app__header__title"),
                         html.P(
-                            "Temperature taken from two DHT11 Temperature and Huminity sensors, one outside my window, and one in my room.",
+                            "temperature taken from two DHT11 temperature and Huminity sensors, one outside my window, and one in my room.",
                             className="app__header__title--grey",
                         ),
                     ],
@@ -95,7 +95,7 @@ app.layout = html.Div(
                 html.Div(
                     [
                         html.Div(
-                            [html.H6("TEMPERATURE (ºF)", className="graph__title")]
+                            [html.H6("temperature (ºF)", className="graph__title")]
                         ),
                         dcc.RangeSlider(
                             id='my-range-slider',
@@ -140,7 +140,7 @@ app.layout = html.Div(
                                 html.Div(
                                     [
                                         html.H6(
-                                            "Temperature Difference",
+                                            "temperature Difference",
                                             className="graph__title",
                                         )
                                     ]
@@ -163,7 +163,7 @@ app.layout = html.Div(
                                 html.Div(
                                     [
                                         html.H6(
-                                            "HUMIDITY", className="graph__title"
+                                            "humidity", className="graph__title"
                                         )
                                     ]
                                 ),
@@ -213,7 +213,7 @@ def gen_temp(interval, value):
     Generate the temperature graph.
     :params interval: update the graph based on an interval
     """
-    df = db.session.query(Temperature).filter((Temperature.dt >= value[0]) & (Temperature.dt <= value[1])).all()
+    df = db.session.query(temperature).filter((temperature.dt >= value[0]) & (temperature.dt <= value[1])).all()
     inside = list(map(lambda x: x.inside, df))
     outside = list(map(lambda x: x.outside, df))
     
@@ -224,20 +224,20 @@ def gen_temp(interval, value):
         type="scatter",
         x=X,
         y=list(map(lambda x: x.inside, df)),
-        line={"color": "#42C4F7", "name":"Inside Temperature"},
+        line={"color": "#42C4F7", "name":"Inside temperature"},
         hoverinfo="x+y",
         mode="lines",
-        name="Inside Temperature"
+        name="Inside temperature"
     )
 
     outside_graph = dict(
         type="scatter",
         x=X,
         y=list(map(lambda x: x.outside, df)),
-        line={"color": "#FF5733", "name":"Outside Temperature"},
+        line={"color": "#FF5733", "name":"Outside temperature"},
         hoverinfo="x+y",
         mode="lines",
-        name="Outside Temperature"
+        name="Outside temperature"
     )
     
     layout = dict(
@@ -277,7 +277,7 @@ def humidity(interval, value):
     Generate the humidity graph.
     :params interval: update the graph based on an interval
     """
-    df = db.session.query(Humidity).filter((Humidity.dt >= value[0]) & (Humidity.dt <= value[1])).all()
+    df = db.session.query(humidity).filter((humidity.dt >= value[0]) & (humidity.dt <= value[1])).all()
     X = list(map(
         lambda x: datetime.datetime.fromtimestamp(time.mktime(time.gmtime(x.id))),
         df))
@@ -292,7 +292,7 @@ def humidity(interval, value):
         line={"color": "#F7C842", "width":1},
         hoverinfo="x+y",
         mode="lines",
-        name="Outside Humidity"
+        name="Outside humidity"
     )
 
     humidity_in_graph = dict(
@@ -302,7 +302,7 @@ def humidity(interval, value):
         line={"color": "#42F797", "width":.5},
         hoverinfo="x+y",
         mode="lines",
-        name="Inside Humidity"
+        name="Inside humidity"
     )
 
     layout = dict(
@@ -342,7 +342,7 @@ def gen_dif(interval, value):
     Genererate wind histogram graph.
     :params interval: upadte the graph based on an interval
     """
-    df = db.session.query(Temperature).filter((Temperature.dt >= value[0]) & (Temperature.dt <= value[1])).all()
+    df = db.session.query(temperature).filter((temperature.dt >= value[0]) & (temperature.dt <= value[1])).all()
     X = list(map(
         lambda x: datetime.datetime.fromtimestamp(time.mktime(time.gmtime(x.dt))),
         df))
@@ -385,7 +385,7 @@ def gen_dif(interval, value):
 
 @server.route("/get-data/<string:table>", methods=["GET"])
 def get_data(table):
-    df = db.session.query(Temperature).filter((Temperature.dt >= 0) & (Temperature.dt <= int(time.time()))).all()
+    df = db.session.query(temperature).filter((temperature.dt >= 0) & (temperature.dt <= int(time.time()))).all()
     print(f"[{table}]")
     return {'data': list(map(lambda x: (x.id, x.dt, x.inside, x.outside, x.dif), df))}
 
@@ -398,11 +398,11 @@ def add_data(table):
         print(f"\t{dt}: {inside} {outside}")
         
         if table == "temperature":
-            data = Temperature(dt, inside, outside, outside-inside)
+            data = temperature(dt, inside, outside, outside-inside)
             db.session.add(data)
             db.session.commit()
         elif table == "humidity":
-            data = Humidity(dt, inside, outside, outside-inside)
+            data = humidity(dt, inside, outside, outside-inside)
             db.session.add(data)
             db.session.commit()
 
