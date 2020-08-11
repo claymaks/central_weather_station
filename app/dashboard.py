@@ -1,7 +1,5 @@
-import flask
-from flask import request
-from flask_sqlalchemy import SQLAlchemy
-from flask_heroku import Heroku
+from app import server, db
+from app.models import *
 
 import dash
 from dash.dependencies import Output, Input
@@ -10,57 +8,9 @@ import dash_html_components as html
 import plotly
 import plotly.graph_objs as go
 
-#from db.api import get_temp_data, insert_data
-
-import os
-import csv
 import time
 import datetime
 
-server = flask.Flask(__name__)
-server.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-server.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get('DATABASE_URL', 'postgresql://localhost/weather')
-heroku = Heroku(server)
-db = SQLAlchemy(server)
-
-class temperature(db.Model):
-    __tablename__ = "temperature"
-    id = db.Column(db.Integer, primary_key=True)
-    dt = db.Column(db.Integer)
-    inside = db.Column(db.Float)
-    outside = db.Column(db.Float)
-    dif = db.Column(db.Float)
-    
-    
-    def __init__(self, dt, inside, outside, dif):
-        self.dt = dt
-        self.inside = inside
-        self.outside = outside
-        self.dif = dif
-
-    def __repr__(self):
-        return f"temperature {self.dt}: {self.outside} - {self.inside} = {self.dif}"
-
-
-class humidity(db.Model):
-    __tablename__ = "humidity"
-    id = db.Column(db.Integer, primary_key=True)
-    dt = db.Column(db.Integer)
-    inside = db.Column(db.Float)
-    outside = db.Column(db.Float)
-    dif = db.Column(db.Float)
-    
-    
-    def __init__(self, dt, inside, outside, dif):
-        self.dt = dt
-        self.inside = inside
-        self.outside = outside
-        self.dif = dif
-
-    def __repr__(self):
-        return f"humidity {self.dt}: {self.outside} - {self.inside} = {self.dif}"
-    
-        
 app = dash.Dash(
     __name__,
     server=server,
@@ -213,7 +163,7 @@ def gen_temp(interval, value):
     Generate the temperature graph.
     :params interval: update the graph based on an interval
     """
-    df = db.session.query(temperature).filter((temperature.dt >= value[0]) & (temperature.dt <= value[1])).all()
+    df = Temperature.query.filter((Temperature.dt >= value[0]) & (Temperature.dt <= value[1])).all()
     inside = list(map(lambda x: x.inside, df))
     outside = list(map(lambda x: x.outside, df))
     
@@ -277,7 +227,7 @@ def humidity(interval, value):
     Generate the humidity graph.
     :params interval: update the graph based on an interval
     """
-    df = db.session.query(humidity).filter((humidity.dt >= value[0]) & (humidity.dt <= value[1])).all()
+    df = Humidity.query.filter((Humidity.dt >= value[0]) & (Humidity.dt <= value[1])).all()
     X = list(map(
         lambda x: datetime.datetime.fromtimestamp(time.mktime(time.gmtime(x.id))),
         df))
@@ -342,7 +292,7 @@ def gen_dif(interval, value):
     Genererate wind histogram graph.
     :params interval: upadte the graph based on an interval
     """
-    df = db.session.query(temperature).filter((temperature.dt >= value[0]) & (temperature.dt <= value[1])).all()
+    df = Temperature.query.filter((Temperature.dt >= value[0]) & (Temperature.dt <= value[1])).all()
     X = list(map(
         lambda x: datetime.datetime.fromtimestamp(time.mktime(time.gmtime(x.dt))),
         df))
@@ -381,35 +331,3 @@ def gen_dif(interval, value):
     )
 
     return dict(data=[dif_graph], layout=layout)
-
-
-@server.route("/get-data/<string:table>", methods=["GET"])
-def get_data(table):
-    df = db.session.query(temperature).filter((temperature.dt >= 0) & (temperature.dt <= int(time.time()))).all()
-    print(f"[{table}]")
-    return {'data': list(map(lambda x: (x.id, x.dt, x.inside, x.outside, x.dif), df))}
-
-@server.route("/add-data/<string:table>", methods=["POST"])
-def add_data(table):
-    print(f"[{table}]")
-    for dt, inside, outside in zip(request.json['dt'],
-                                 request.json['inside'],
-                                 request.json['outside']):
-        print(f"\t{dt}: {inside} {outside}")
-        
-        if table == "temperature":
-            data = temperature(dt, inside, outside, outside-inside)
-            db.session.add(data)
-            db.session.commit()
-        elif table == "humidity":
-            data = humidity(dt, inside, outside, outside-inside)
-            db.session.add(data)
-            db.session.commit()
-
-        
-    return ''
-
-
-if __name__ == "__main__":
-    app.run_server(port=5000, debug=False)
-
