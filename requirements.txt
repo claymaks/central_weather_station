@@ -7,4 +7,5 @@ python-dateutil
 flask-heroku
 flask-sqlalchemy
 flask-migrate
+flask-script
 psycopg2-binary
