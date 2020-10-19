@@ -28,9 +28,9 @@ app.layout = html.Div(
             [
                 html.Div(
                     [
-                        html.H4("INSIDE/OUTSIDE temperature DIFFERENTIAL", className="app__header__title"),
+                        html.H4("INSIDE/OUTSIDE TEMPERATURE DIFFERENTIAL", className="app__header__title"),
                         html.P(
-                            "temperature taken from two DHT11 temperature and Huminity sensors, one outside my window, and one in my room.",
+                            "temperature taken from an indoor and outdoor DHT11 temperature and humidity sensor.",
                             className="app__header__title--grey",
                         ),
                     ],
@@ -45,7 +45,7 @@ app.layout = html.Div(
                 html.Div(
                     [
                         html.Div(
-                            [html.H6("temperature (ºF)", className="graph__title")]
+                            [html.H6("Temperature (ºF)", className="graph__title")]
                         ),
                         dcc.RangeSlider(
                             id='my-range-slider',
@@ -90,7 +90,7 @@ app.layout = html.Div(
                                 html.Div(
                                     [
                                         html.H6(
-                                            "temperature Difference",
+                                            "Temperature Difference",
                                             className="graph__title",
                                         )
                                     ]
@@ -113,7 +113,7 @@ app.layout = html.Div(
                                 html.Div(
                                     [
                                         html.H6(
-                                            "humidity", className="graph__title"
+                                            "Humidity", className="graph__title"
                                         )
                                     ]
                                 ),
@@ -174,20 +174,20 @@ def gen_temp(interval, value):
         type="scatter",
         x=X,
         y=list(map(lambda x: x.inside, df)),
-        line={"color": "#42C4F7", "name":"Inside temperature"},
+        line={"color": "#42C4F7", "name":"inside"},
         hoverinfo="x+y",
         mode="lines",
-        name="Inside temperature"
+        name="inside"
     )
 
     outside_graph = dict(
         type="scatter",
         x=X,
         y=list(map(lambda x: x.outside, df)),
-        line={"color": "#FF5733", "name":"Outside temperature"},
+        line={"color": "#FF5733", "name":"outside"},
         hoverinfo="x+y",
         mode="lines",
-        name="Outside temperature"
+        name="outside"
     )
     
     layout = dict(
@@ -229,11 +229,11 @@ def humidity(interval, value):
     """
     df = Humidity.query.filter((Humidity.dt >= value[0]) & (Humidity.dt <= value[1])).all()
     X = list(map(
-        lambda x: datetime.datetime.fromtimestamp(time.mktime(time.gmtime(x.id))),
+        lambda x: datetime.datetime.fromtimestamp(time.mktime(time.gmtime(x.dt))),
         df))
     inside = list(map(lambda x: x.inside, df))
     outside = list(map(lambda x: x.outside, df))
-
+    print(len(df))
 
     humidity_out_graph = dict(
         type="scatter",
@@ -242,7 +242,7 @@ def humidity(interval, value):
         line={"color": "#F7C842", "width":1},
         hoverinfo="x+y",
         mode="lines",
-        name="Outside humidity"
+        name="outside"
     )
 
     humidity_in_graph = dict(
@@ -252,7 +252,7 @@ def humidity(interval, value):
         line={"color": "#42F797", "width":.5},
         hoverinfo="x+y",
         mode="lines",
-        name="Inside humidity"
+        name="inside"
     )
 
     layout = dict(
