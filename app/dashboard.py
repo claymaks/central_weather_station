@@ -194,6 +194,8 @@ def gen_temp(interval, value):
         type="scatter",
         x=[1603147805],
         y=[62],
+        mode="markers+text",
+        name="key events",
         text=["Moved outdoor sensor outside"],
         textposition="middle right"
     )
@@ -267,6 +269,8 @@ def humidity(interval, value):
         type="scatter",
         x=[1603147805],
         y=[50],
+        mode="markers+text",
+        name="key events",
         text=["Moved outdoor sensor outside"],
         textposition="middle right"
     )
@@ -326,6 +330,8 @@ def gen_dif(interval, value):
         type="scatter",
         x=[1603147805],
         y=[-10],
+        mode="markers+text",
+        name="key events",
         text=["Moved outdoor sensor outside"],
         textposition="middle right"
     )
