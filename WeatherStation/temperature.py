@@ -77,7 +77,7 @@ def main(buffer=60*30, measure_delay=10*60,
                     if temperature_c_o is None:
                         raise BadRead
                     temperature_f_o = temperature_c_o * (9 / 5) + 32
-                    humidity_o = ouside_sensor.humidity
+                    humidity_o = outside_sensor.humidity
                     print("\tOUTSIDE:")
                     print("\t\tTemp: {:.1f} F / {:.1f} C    Humidity: {}% ".format(
                         temperature_f_o, temperature_c_o, humidity_o))
