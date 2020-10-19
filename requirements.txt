@@ -8,4 +8,4 @@ flask-heroku
 flask-sqlalchemy
 flask-migrate
 flask-script
-psycopg2-binary
+psycopg2
