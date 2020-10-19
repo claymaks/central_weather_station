@@ -189,6 +189,14 @@ def gen_temp(interval, value):
         mode="lines",
         name="outside"
     )
+
+    labels = dict(
+        type="scatter",
+        x=[1603147805],
+        y=[62],
+        text=["Moved outdoor sensor outside"],
+        textposition="middle right"
+    )
     
     layout = dict(
         plot_bgcolor=app_color["graph_bg"],
@@ -214,7 +222,7 @@ def gen_temp(interval, value):
         },
     )
 
-    return dict(data=[inside_graph, outside_graph], layout=layout)
+    return dict(data=[inside_graph, outside_graph, labels], layout=layout)
 
 
 @app.callback(
@@ -255,6 +263,14 @@ def humidity(interval, value):
         name="inside"
     )
 
+    labels = dict(
+        type="scatter",
+        x=[1603147805],
+        y=[50],
+        text=["Moved outdoor sensor outside"],
+        textposition="middle right"
+    )
+
     layout = dict(
         plot_bgcolor=app_color["graph_bg"],
         paper_bgcolor=app_color["graph_bg"],
@@ -279,7 +295,7 @@ def humidity(interval, value):
         },
     )
 
-    return dict(data=[humidity_out_graph, humidity_in_graph], layout=layout)
+    return dict(data=[humidity_out_graph, humidity_in_graph, labels], layout=layout)
 
 
 @app.callback(
@@ -306,6 +322,14 @@ def gen_dif(interval, value):
         mode="lines",
     )
 
+    labels = dict(
+        type="scatter",
+        x=[1603147805],
+        y=[-10],
+        text=["Moved outdoor sensor outside"],
+        textposition="middle right"
+    )
+
     layout = dict(
         plot_bgcolor=app_color["graph_bg"],
         paper_bgcolor=app_color["graph_bg"],
@@ -330,4 +354,4 @@ def gen_dif(interval, value):
         },
     )
 
-    return dict(data=[dif_graph], layout=layout)
+    return dict(data=[dif_graph, labels], layout=layout)
