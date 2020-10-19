@@ -164,6 +164,7 @@ def gen_temp(interval, value):
     :params interval: update the graph based on an interval
     """
     df = Temperature.query.filter((Temperature.dt >= value[0]) & (Temperature.dt <= value[1])).all()
+    print(len(df))
     inside = list(map(lambda x: x.inside, df))
     outside = list(map(lambda x: x.outside, df))
     
