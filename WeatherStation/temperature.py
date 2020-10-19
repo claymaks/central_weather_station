@@ -5,8 +5,8 @@ import requests
 
 inside_sensor = adafruit_dht.DHT11(board.D23)
 ouside_sensor = adafruit_dht.DHT11(board.D24)
-measure_delay = 10 # * 60
-buffer = 60 # * 60
+measure_delay = 10 * 60
+buffer = 60 * 30
 temp_i_buffer = []
 temp_o_buffer = []
 
@@ -31,7 +31,7 @@ while True:
         
         attempt = 0
         while not read_success:
-            print("(", i, ", ", attempt, ")", sep='')
+            print("\t(", i, ", ", attempt, ")", sep='')
             attempt += 1
             try:
                 # Print the values to the serial port
@@ -69,6 +69,7 @@ while True:
         humi_i_buffer.append(humidity_i)
         humi_o_buffer.append(humidity_o)
         dt_buffer.append(int(time.time()))
+        print("\t{}".format(time.time()))
         
         time.sleep(measure_delay)
         
@@ -76,10 +77,10 @@ while True:
                   json={'dt': dt_buffer,
                         'inside': temp_i_buffer,
                         'outside': temp_o_buffer}, timeout=20)
-    print(r1.status_code)
+    
     r2 = requests.post("http://cmaks-weather.herokuapp.com/add-data/humidity",
                   json={'dt': dt_buffer,
                         'inside': humi_i_buffer,
                         'outside': humi_o_buffer}, timeout=20)
-    print(r2.status_code)
+    
     time.sleep(buffer)
