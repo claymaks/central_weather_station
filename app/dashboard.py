@@ -49,7 +49,7 @@ app.layout = html.Div(
                         ),
                         dcc.RangeSlider(
                             id='my-range-slider',
-                            min=time.mktime(datetime.datetime(2020,8,8).timetuple()),
+                            min=time.mktime(datetime.datetime(2020,10,18).timetuple()),
                             max=time.mktime(datetime.datetime.now().timetuple()),
                             value=[time.mktime((datetime.datetime.now() - datetime.timedelta(1)).timetuple()),
                                    time.mktime(datetime.datetime.now().timetuple())],
@@ -164,7 +164,6 @@ def gen_temp(interval, value):
     :params interval: update the graph based on an interval
     """
     df = Temperature.query.filter((Temperature.dt >= value[0]) & (Temperature.dt <= value[1])).all()
-    print(len(df))
     inside = list(map(lambda x: x.inside, df))
     outside = list(map(lambda x: x.outside, df))
     
