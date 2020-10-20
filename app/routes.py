@@ -71,8 +71,6 @@ def condense(sz=4500, interval=50):
         new_temp.append(np.sum(arr, axis=1)/interval)
     new_temp = np.array(new_temp).T
     print("condensed temperature")
-    batch_delete_data("temperature", request.json.get('start'), request.json.get('end'))
-    print("deleted")
     add_data("temperature", json={'dt': new_temp[0], 'inside': new_temp[1], 'outside': new_temp[2]})
     print("added")
 
@@ -87,8 +85,6 @@ def condense(sz=4500, interval=50):
         new_humid.append(np.sum(arr, axis=1)/interval)
     new_humid = np.array(new_humid).T
     print("condensed humidity")
-    batch_delete_data("humidity", request.json.get('start'), request.json.get('end'))
-    print("deleted")
     add_data("humidity", json={'dt': new_humid[0], 'inside': new_humid[1], 'outside': new_humid[2]})
     print("added")
     
