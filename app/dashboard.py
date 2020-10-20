@@ -168,6 +168,7 @@ def gen_temp(interval, value):
     :params interval: update the graph based on an interval
     """
     df = Temperature.query.filter((Temperature.dt >= value[0]) & (Temperature.dt <= value[1])).all()
+    df.sort(key=lambda x: x.dt)
     inside = list(map(lambda x: x.inside, df))
     outside = list(map(lambda x: x.outside, df))
     
@@ -242,6 +243,7 @@ def humidity(interval, value):
     :params interval: update the graph based on an interval
     """
     df = Humidity.query.filter((Humidity.dt >= value[0]) & (Humidity.dt <= value[1])).all()
+    df.sort(key=lambda x: x.dt)
     X = list(map(
         lambda x: datetime.datetime.fromtimestamp(x.dt, tz=tz),
         df))
@@ -317,6 +319,7 @@ def gen_dif(interval, value):
     :params interval: upadte the graph based on an interval
     """
     df = Temperature.query.filter((Temperature.dt >= value[0]) & (Temperature.dt <= value[1])).all()
+    df.sort(key=lambda x: x.dt)
     X = list(map(
         lambda x: datetime.datetime.fromtimestamp(x.dt, tz=tz),
         df))
