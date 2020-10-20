@@ -62,7 +62,7 @@ def batch_delete_data(table, strt, end):
 @server.route("/condense/", methods=["PUT"])
 def condense(sz=4500, interval=50):
     temp = Temperature.query.filter((Temperature.dt >= 0) & (Temperature.dt <= int(time.time()))).all()
-    temp_df = np.array(list(map(lambda x: (x.id, x.dt, x.inside, x.outside, x.dif), temp_df)))
+    temp_df = np.array(list(map(lambda x: (x.id, x.dt, x.inside, x.outside, x.dif), temp)))
     temp_df = temp_df.T[1:]
     
     new_temp = []
@@ -78,7 +78,7 @@ def condense(sz=4500, interval=50):
 
 
     humid = Humidity.query.filter((Humidity.dt >= 0) & (Humidity.dt <= int(time.time()))).all()
-    humid_df = np.array(list(map(lambda x: (x.id, x.dt, x.inside, x.outside, x.dif), humid_df)))
+    humid_df = np.array(list(map(lambda x: (x.id, x.dt, x.inside, x.outside, x.dif), humid)))
     humid_df = humid_df.T[1:]
     
     new_humid = []
