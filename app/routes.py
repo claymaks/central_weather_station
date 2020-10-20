@@ -2,6 +2,7 @@ from app import server, db
 from app.models import *
 from app.dashboard import *
 from flask import request
+import numpy
 
 import time
 
@@ -17,11 +18,12 @@ def get_data(table):
 
 
 @server.route("/add-data/<string:table>", methods=["POST"])
-def add_data(table):
+def add_data(table, json=None):
     print(f"[{table}]")
-    for dt, inside, outside in zip(request.json['dt'],
-                                   request.json['inside'],
-                                   request.json['outside']):
+    json = json or request.json
+    for dt, inside, outside in zip(json['dt'],
+                                   json['inside'],
+                                   json['outside']):
         print(f"\t{dt}: {inside} {outside}")
 
         if table == "temperature":
@@ -36,8 +38,8 @@ def add_data(table):
     return ''
 
 
-@server.route("/delete-data/<int:_id>/<string:table>", methods=["DELETE"])
-def delete_data(_id, table):
+@server.route("/delete-data/<string:table>/<int:_id>", methods=["DELETE"])
+def delete_data(table, _id):
     deleted = False
     if table == "temperature" and Temperature.query.get(_id):
         db.session.delete(Temperature.query.get(_id))
@@ -46,4 +48,46 @@ def delete_data(_id, table):
         db.session.delete(Humidity.query.get(_id))
         deleted = True
     return {'deleted': deleted, 'table': table, 'id': _id}
+
+
+@server.route("/delete-data/<string:table>/<int:strt>/<int:end>", methods=["DELETE"])
+def batch_delete_data(table, strt, end):
+    deleted = []
+    for _id in range(strt, end):
+        deleted.append(delete_data(table, _id)['deleted'])
+    return {'deleted': deleted, 'table': table, 'ids': list(range(strt, end))}
+
+
+@server.route("/condense/", methods=["PUT"])
+def condense(sz=4000, interval=100):
+    temp = Temperature.query.filter((Temperature.dt >= 0) & (Temperature.dt <= int(time.time()))).all()
+    temp_df = np.array(list(map(lambda x: (x.id, x.dt, x.inside, x.outside, x.dif), temp_df)))
+    temp_df = temp_df.T[1:]
+    
+    new_temp = []
+    for i in range(0,sz, interval):
+        arr = temp_df[:,i:i+interval]
+        new_temp.append(np.sum(arr, axis=1)/interval)
+    new_temp = np.array(new_temp).T
+
+    batch_delete_data("temperature", request.json.get('start'), request.json.get('end'))
+    add_data("temperature", json={'dt': new_temp[0], 'inside': new_temp[1], 'outside': new_temp[2]})
+
+
+    humid = Humidity.query.filter((Humidity.dt >= 0) & (Humidity.dt <= int(time.time()))).all()
+    humid_df = np.array(list(map(lambda x: (x.id, x.dt, x.inside, x.outside, x.dif), humid_df)))
+    humid_df = humid_df.T[1:]
+    
+    new_humid = []
+    for i in range(0,sz, interval):
+        arr = humid_df[:,i:i+interval]
+        new_humid.append(np.sum(arr, axis=1)/interval)
+    new_humid = np.array(new_humid).T
+
+    batch_delete_data("humidity", request.json.get('start'), request.json.get('end'))
+    add_data("humidity", json={'dt': new_humid[0], 'inside': new_humid[1], 'outside': new_humid[2]}
+
+    
+    
+    
                           
