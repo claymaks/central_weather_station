@@ -85,8 +85,9 @@ def condense(sz=4000, interval=100):
     new_humid = np.array(new_humid).T
 
     batch_delete_data("humidity", request.json.get('start'), request.json.get('end'))
-    add_data("humidity", json={'dt': new_humid[0], 'inside': new_humid[1], 'outside': new_humid[2]}
-
+    add_data("humidity", json={'dt': new_humid[0], 'inside': new_humid[1], 'outside': new_humid[2]})
+    
+    return ''
     
     
     
