@@ -53,14 +53,9 @@ def delete_data(table, _id):
 
 @server.route("/delete-data/<string:table>/<int:strt>/<int:end>", methods=["DELETE"])
 def batch_delete_data(table, strt, end):
-    deleted = False
-    if table == "temperature" and Temperature.query.get(_id):
-        db.session.delete(Temperature.query.get(_id))
-        deleted = True
-    elif table == "humidity" and Humidity.query.get(_id):
-        db.session.delete(Humidity.query.get(_id))
-        deleted = True
-    db.session.commit()
+    deleted = []
+    for _id in range(strt, end):
+        deleted.append(delete_data(table, _id)['deleted'])
     return {'deleted': deleted, 'table': table, 'ids': list(range(strt, end))}
 
 
