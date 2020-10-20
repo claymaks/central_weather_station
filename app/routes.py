@@ -59,7 +59,7 @@ def batch_delete_data(table, strt, end):
 
 
 @server.route("/condense/", methods=["PUT"])
-def condense(sz=4000, interval=100):
+def condense(sz=4500, interval=50):
     temp = Temperature.query.filter((Temperature.dt >= 0) & (Temperature.dt <= int(time.time()))).all()
     temp_df = np.array(list(map(lambda x: (x.id, x.dt, x.inside, x.outside, x.dif), temp_df)))
     temp_df = temp_df.T[1:]
