@@ -2,7 +2,7 @@ from app import server, db
 from app.models import *
 from app.dashboard import *
 from flask import request
-import numpy
+import numpy as np
 
 import time
 
