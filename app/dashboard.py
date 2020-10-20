@@ -10,6 +10,9 @@ import plotly.graph_objs as go
 
 import time
 import datetime
+from pytz import timezone
+
+tz = timezone('US/Eastern')
 
 app = dash.Dash(
     __name__,
@@ -50,9 +53,9 @@ app.layout = html.Div(
                         dcc.RangeSlider(
                             id='my-range-slider',
                             min=time.mktime(datetime.datetime(2020,10,18).timetuple()),
-                            max=time.mktime(datetime.datetime.now().timetuple()),
-                            value=[time.mktime((datetime.datetime.now() - datetime.timedelta(1)).timetuple()),
-                                   time.mktime(datetime.datetime.now().timetuple())],
+                            max=time.mktime(datetime.datetime.now(tz).timetuple()) + 60*60*24,
+                            value=[time.mktime((datetime.datetime.now(tz) - datetime.timedelta(1)).timetuple()),
+                                   time.mktime(datetime.datetime.now(tz).timetuple())],
                         ),
 
                         html.Div([
@@ -150,7 +153,7 @@ def slen(df):
     [Input("my-range-slider", "value")]
 )
 def update_range(value):
-    return datetime.datetime.strftime(datetime.datetime.fromtimestamp(value[0]), "%a %b %d %H:%M:%S %Y") + ' - ' + datetime.datetime.strftime(datetime.datetime.fromtimestamp(value[1]), "%a %b %d %H:%M:%S %Y")
+    return datetime.datetime.strftime(datetime.datetime.fromtimestamp(value[0], tz=tz), "%a %b %d %H:%M:%S %Y") + ' - ' + datetime.datetime.strftime(datetime.datetime.fromtimestamp(value[1], tz=tz), "%a %b %d %H:%M:%S %Y")
 
 
 @app.callback(
@@ -168,7 +171,7 @@ def gen_temp(interval, value):
     outside = list(map(lambda x: x.outside, df))
     
     X = list(map(
-        lambda x: datetime.datetime.fromtimestamp(x.dt),
+        lambda x: datetime.datetime.fromtimestamp(x.dt, tz=tz),
         df))
     inside_graph = dict(
         type="scatter",
@@ -192,7 +195,7 @@ def gen_temp(interval, value):
 
     labels = dict(
         type="scatter",
-        x=[datetime.datetime.fromtimestamp(1603147805)],
+        x=[datetime.datetime.fromtimestamp(1603147805, tz=tz)],
         y=[62],
         mode="markers+text",
         name="key events",
@@ -206,7 +209,7 @@ def gen_temp(interval, value):
         font={"color": "#fff"},
         height=700,
         xaxis={
-            "range": list(map(lambda x: datetime.datetime.fromtimestamp(x), value)),
+            "range": list(map(lambda x: datetime.datetime.fromtimestamp(x, tz=tz), value)),
             "showline": True,
             "zeroline": False,
             "fixedrange": True,
@@ -239,7 +242,7 @@ def humidity(interval, value):
     """
     df = Humidity.query.filter((Humidity.dt >= value[0]) & (Humidity.dt <= value[1])).all()
     X = list(map(
-        lambda x: datetime.datetime.fromtimestamp(x.dt),
+        lambda x: datetime.datetime.fromtimestamp(x.dt, tz=tz),
         df))
     inside = list(map(lambda x: x.inside, df))
     outside = list(map(lambda x: x.outside, df))
@@ -267,7 +270,7 @@ def humidity(interval, value):
 
     labels = dict(
         type="scatter",
-        x=[datetime.datetime.fromtimestamp(1603147805)],
+        x=[datetime.datetime.fromtimestamp(1603147805, tz=tz)],
         y=[50],
         mode="markers+text",
         name="key events",
@@ -281,7 +284,7 @@ def humidity(interval, value):
         font={"color": "#fff"},
         height=350,
         xaxis={
-            "range": list(map(lambda x: datetime.datetime.fromtimestamp(x), value)),
+            "range": list(map(lambda x: datetime.datetime.fromtimestamp(x, tz=tz), value)),
             "showline": True,
             "zeroline": False,
             "fixedrange": True,
@@ -314,7 +317,7 @@ def gen_dif(interval, value):
     """
     df = Temperature.query.filter((Temperature.dt >= value[0]) & (Temperature.dt <= value[1])).all()
     X = list(map(
-        lambda x: datetime.datetime.fromtimestamp(x.dt),
+        lambda x: datetime.datetime.fromtimestamp(x.dt, tz=tz),
         df))
     
     dif_graph = dict(
@@ -328,7 +331,7 @@ def gen_dif(interval, value):
 
     labels = dict(
         type="scatter",
-        x=[datetime.datetime.fromtimestamp(1603147805)],
+        x=[datetime.datetime.fromtimestamp(1603147805, tz=tz)],
         y=[-10],
         mode="markers+text",
         name="key events",
@@ -342,7 +345,7 @@ def gen_dif(interval, value):
         font={"color": "#fff"},
         height=350,
         xaxis={
-            "range": list(map(lambda x: datetime.datetime.fromtimestamp(x), value)),
+            "range": list(map(lambda x: datetime.datetime.fromtimestamp(x, tz=tz), value)),
             "showline": True,
             "zeroline": False,
             "fixedrange": True,
