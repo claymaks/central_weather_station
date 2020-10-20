@@ -50,9 +50,9 @@ app.layout = html.Div(
                         dcc.RangeSlider(
                             id='my-range-slider',
                             min=time.mktime(datetime.datetime(2020,10,18).timetuple()),
-                            max=time.mktime(datetime.datetime.now().timetuple()) + 4 * 60 * 60,
+                            max=time.mktime(datetime.datetime.now().timetuple()),
                             value=[time.mktime((datetime.datetime.now() - datetime.timedelta(1)).timetuple()),
-                                   time.mktime(datetime.datetime.now().timetuple()) + 4 * 60 * 60],
+                                   time.mktime(datetime.datetime.now().timetuple())],
                         ),
 
                         html.Div([
@@ -163,12 +163,12 @@ def gen_temp(interval, value):
     Generate the temperature graph.
     :params interval: update the graph based on an interval
     """
-    df = Temperature.query.filter((Temperature.dt >= value[0]) & (Temperature.dt <= value[1])).all()
+    df = Temperature.query.filter((Temperature.dt - 4 * 60 * 60 >= value[0]) & (Temperature.dt - 4 * 60 * 60 <= value[1])).all()
     inside = list(map(lambda x: x.inside, df))
     outside = list(map(lambda x: x.outside, df))
     
     X = list(map(
-        lambda x: datetime.datetime.fromtimestamp(time.mktime(time.gmtime(x.dt))),
+        lambda x: datetime.datetime.fromtimestamp(x.dt),
         df))
     inside_graph = dict(
         type="scatter",
@@ -192,7 +192,7 @@ def gen_temp(interval, value):
 
     labels = dict(
         type="scatter",
-        x=[datetime.datetime.fromtimestamp(time.mktime(time.gmtime(1603147805)))],
+        x=[datetime.datetime.fromtimestamp(1603147805)],
         y=[62],
         mode="markers+text",
         name="key events",
@@ -239,7 +239,7 @@ def humidity(interval, value):
     """
     df = Humidity.query.filter((Humidity.dt >= value[0]) & (Humidity.dt <= value[1])).all()
     X = list(map(
-        lambda x: datetime.datetime.fromtimestamp(time.mktime(time.gmtime(x.dt))),
+        lambda x: datetime.datetime.fromtimestamp(x.dt),
         df))
     inside = list(map(lambda x: x.inside, df))
     outside = list(map(lambda x: x.outside, df))
@@ -267,7 +267,7 @@ def humidity(interval, value):
 
     labels = dict(
         type="scatter",
-        x=[datetime.datetime.fromtimestamp(time.mktime(time.gmtime(1603147805)))],
+        x=[datetime.datetime.fromtimestamp(1603147805)],
         y=[50],
         mode="markers+text",
         name="key events",
@@ -314,7 +314,7 @@ def gen_dif(interval, value):
     """
     df = Temperature.query.filter((Temperature.dt >= value[0]) & (Temperature.dt <= value[1])).all()
     X = list(map(
-        lambda x: datetime.datetime.fromtimestamp(time.mktime(time.gmtime(x.dt))),
+        lambda x: datetime.datetime.fromtimestamp(x.dt),
         df))
     
     dif_graph = dict(
@@ -328,7 +328,7 @@ def gen_dif(interval, value):
 
     labels = dict(
         type="scatter",
-        x=[datetime.datetime.fromtimestamp(time.mktime(time.gmtime(1603147805)))],
+        x=[datetime.datetime.fromtimestamp(1603147805)],
         y=[-10],
         mode="markers+text",
         name="key events",
