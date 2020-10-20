@@ -55,11 +55,12 @@ def delete_data(table, _id):
 def batch_delete_data(table, strt, end):
     deleted = False
     if table == "temperature":
-        db.session.delete(Temperature.query.filter((Temperature.id >= strt) & (Temperature.id <= end)).all())
+        stmt = Temperature.delete().where(Temperature.id >= strt).where(Temperature.id <= end)
+        db.execute(stmt)
         deleted = True
     elif table == "humidity":
-        db.session.delete(Humidity.query.filter((Humidity.id >= strt) & (Humidity.id <= end)).all())
-        deleted = True
+        stmt = Humidity.delete().where(Humidity.id >= strt).where(Humidity.id <= end)
+        db.execute(stmt)
     db.session.commit()
     return {'deleted': deleted, 'table': table, 'id_start': strt, 'id_end': end}
 
