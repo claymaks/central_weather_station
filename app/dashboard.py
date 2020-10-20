@@ -192,7 +192,7 @@ def gen_temp(interval, value):
 
     labels = dict(
         type="scatter",
-        x=[1603147805],
+        x=[datetime.datetime.fromtimestamp(time.mktime(time.gmtime(1603147805)))],
         y=[62],
         mode="markers+text",
         name="key events",
@@ -267,7 +267,7 @@ def humidity(interval, value):
 
     labels = dict(
         type="scatter",
-        x=[1603147805],
+        x=[datetime.datetime.fromtimestamp(time.mktime(time.gmtime(1603147805)],
         y=[50],
         mode="markers+text",
         name="key events",
@@ -328,7 +328,7 @@ def gen_dif(interval, value):
 
     labels = dict(
         type="scatter",
-        x=[1603147805],
+        x=[datetime.datetime.fromtimestamp(time.mktime(time.gmtime(1603147805)],
         y=[-10],
         mode="markers+text",
         name="key events",
