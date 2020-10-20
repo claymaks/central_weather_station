@@ -47,6 +47,7 @@ def delete_data(table, _id):
     elif table == "humidity" and Humidity.query.get(_id):
         db.session.delete(Humidity.query.get(_id))
         deleted = True
+    db.session.commit()
     return {'deleted': deleted, 'table': table, 'id': _id}
 
 
