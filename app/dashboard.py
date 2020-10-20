@@ -53,9 +53,9 @@ app.layout = html.Div(
                         dcc.RangeSlider(
                             id='my-range-slider',
                             min=time.mktime(datetime.datetime(2020,10,18).timetuple()),
-                            max=time.mktime(datetime.datetime.now(tz).timetuple()) + 60*60*24 + 60*60*4,
-                            value=[time.mktime((datetime.datetime.now(tz) - datetime.timedelta(1)).timetuple()) + 60*60*4,
-                                   time.mktime(datetime.datetime.now(tz).timetuple()) + 60*60*4],
+                            max=time.mktime(datetime.datetime.now(tz).timetuple()) + 60*60*24,
+                            value=[time.mktime((datetime.datetime.now(tz) - datetime.timedelta(1)).timetuple()),
+                                   time.mktime(datetime.datetime.now(tz).timetuple())],
                         ),
 
                         html.Div([
