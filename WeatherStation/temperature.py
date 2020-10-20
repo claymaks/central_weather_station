@@ -31,6 +31,8 @@ def complete_request(func, addr, *args, **kwargs):
             print(".   ERROR:", e)
             time.sleep((2 ** n) / 100)
             n += 1
+        else:
+            n += 1
     if n > 5:
         print(".   FAILED")
 
