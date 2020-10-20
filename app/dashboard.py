@@ -53,9 +53,9 @@ app.layout = html.Div(
                         dcc.RangeSlider(
                             id='my-range-slider',
                             min=time.mktime(datetime.datetime(2020,10,18).timetuple()),
-                            max=time.mktime(datetime.datetime.now(tz).timetuple()) + 60*60*24,
-                            value=[time.mktime((datetime.datetime.now(tz) - datetime.timedelta(1)).timetuple()),
-                                   time.mktime(datetime.datetime.now(tz).timetuple())],
+                            max=time.mktime(datetime.datetime.now(tz).timetuple()) + 60*60*24 + 60*60*4,
+                            value=[time.mktime((datetime.datetime.now(tz) - datetime.timedelta(1)).timetuple()) + 60*60*4,
+                                   time.mktime(datetime.datetime.now(tz).timetuple()) + 60*60*4],
                         ),
 
                         html.Div([
@@ -153,6 +153,7 @@ def slen(df):
     [Input("my-range-slider", "value")]
 )
 def update_range(value):
+    print(value)
     return datetime.datetime.strftime(datetime.datetime.fromtimestamp(value[0], tz=tz), "%a %b %d %H:%M:%S %Y") + ' - ' + datetime.datetime.strftime(datetime.datetime.fromtimestamp(value[1], tz=tz), "%a %b %d %H:%M:%S %Y")
 
 
