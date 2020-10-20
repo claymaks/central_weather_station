@@ -54,15 +54,14 @@ def delete_data(table, _id):
 @server.route("/delete-data/<string:table>/<int:strt>/<int:end>", methods=["DELETE"])
 def batch_delete_data(table, strt, end):
     deleted = False
-    if table == "temperature":
-        stmt = Temperature.delete().where(Temperature.id >= strt).where(Temperature.id <= end)
-        db.execute(stmt)
+    if table == "temperature" and Temperature.query.get(_id):
+        db.session.delete(Temperature.query.get(_id))
         deleted = True
-    elif table == "humidity":
-        stmt = Humidity.delete().where(Humidity.id >= strt).where(Humidity.id <= end)
-        db.execute(stmt)
+    elif table == "humidity" and Humidity.query.get(_id):
+        db.session.delete(Humidity.query.get(_id))
+        deleted = True
     db.session.commit()
-    return {'deleted': deleted, 'table': table, 'id_start': strt, 'id_end': end}
+    return {'deleted': deleted, 'table': table, 'ids': list(range(strt, end))}
 
 
 @server.route("/condense/", methods=["PUT"])
