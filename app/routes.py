@@ -34,3 +34,16 @@ def add_data(table):
             db.session.commit()
 
     return ''
+
+
+@server.route("/delete-data/<int:_id>/<string:table>", methods=["DELETE"])
+def delete_data(_id, table):
+    deleted = False
+    if table == "temperature" and Temperature.query.get(_id):
+        db.session.delete(Temperature.query.get(_id))
+        deleted = True
+    elif table == "humidity" and Humidity.query.get(_id):
+        db.session.delete(Humidity.query.get(_id))
+        deleted = True
+    return {'deleted': deleted, 'table': table, 'id': _id}
+                          
