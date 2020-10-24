@@ -11,6 +11,7 @@ class BadRead(Exception):
 
 
 def complete_request(func, addr, *args, **kwargs):
+    print("MAKING REQUEST...")
     """
     Exponential backoff
     """
@@ -107,13 +108,13 @@ def main(buffer=60*30, measure_delay=10*60,
         r1 = complete_request(requests.post, "http://cmaks-weather.herokuapp.com/add-data/temperature",
                       json={'dt': dt_buffer,
                             'inside': temp_i_buffer,
-                            'outside': temp_o_buffer}, timeout=20)
+                            'outside': temp_o_buffer}, timeout=30)
         
         r2 = complete_request(requests.post, "http://cmaks-weather.herokuapp.com/add-data/humidity",
                       json={'dt': dt_buffer,
                             'inside': humi_i_buffer,
-                            'outside': humi_o_buffer}, timeout=20)
-        
+                            'outside': humi_o_buffer}, timeout=30)
+        print(r1.status_code, r2.status_code)
         time.sleep(buffer)
 
 
